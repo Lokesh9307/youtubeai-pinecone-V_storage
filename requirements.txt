@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pydantic
+yt-dlp
+faster-whisper
+fastembed
+pinecone
+python-dotenv

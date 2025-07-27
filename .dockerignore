@@ -1,0 +1,45 @@
+# Byte-compiled / cache files
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Virtual environment
+venv/
+.env/
+*.env
+
+# macOS / Linux system files
+.DS_Store
+*.swp
+
+# Git files
+.git
+.gitignore
+
+# Docker artifacts
+Dockerfile
+.dockerignore
+
+# Test folders or files
+tests/
+*.pytest_cache/
+
+# Logs
+*.log
+
+# IDE/editor folders
+.vscode/
+.idea/
+*.code-workspace
+
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.env
+venv/
+.git
+.idea/
+*.db
+*.sqlite3
