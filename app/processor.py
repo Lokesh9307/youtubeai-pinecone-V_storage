@@ -13,7 +13,7 @@ pc = Pinecone(api_key=api_key)
 pinecone_index = pc.Index("superllm")
 
 # Initialize the embedding model from fast-embed
-embedding_model = TextEmbedding(model_name="BAAI/bge-small-en-v1.5")
+embedding_model = TextEmbedding(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
 # Initialize the transcription model (ONNX-based, fast and light)
 transcription_model = WhisperModel("base", device="cpu")  # or "cuda" if GPU available
