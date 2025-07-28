@@ -1,15 +1,15 @@
 import os
-import yt_dlp
 from fastembed import TextEmbedding
 from pinecone import Pinecone
 from faster_whisper import WhisperModel
+from pytube import YouTube
 from dotenv import load_dotenv
+import traceback
 
 load_dotenv()
 
 api_key = os.getenv("PINECONE_API_KEY")
 pc = Pinecone(api_key=api_key)
-print(api_key)
 pinecone_index = pc.Index("superllm")
 
 # Initialize the embedding model from fast-embed
@@ -50,26 +50,26 @@ def process_video_and_upsert(video_url: str, video_id: str):
         # Step 6: Upsert the vectors into the Pinecone index
         pinecone_index.upsert(vectors=vectors_to_upsert)
 
-        print(f"Successfully processed and upserted video: {video_id}")
+        print(f"✅ Successfully processed and upserted video: {video_id}")
         return {"status": "success", "message": f"Video {video_id} processed."}
 
     except Exception as e:
-        print(f"Error processing {video_id}: {e}")
+        print(f"❌ Error processing {video_id}: {e}")
+        traceback.print_exc()
         return {"status": "error", "message": str(e)}
 
 def download_audio(video_url: str, video_id: str) -> str:
-    """Downloads audio from a YouTube URL to a temporary file."""
-    output_template = f"./{video_id}.%(ext)s"
-    ydl_opts = {
-        'format': 'bestaudio/best',
-        'postprocessors': [{'key': 'FFmpegExtractAudio', 'preferredcodec': 'mp3'}],
-        'outtmpl': output_template,
-        'quiet': True,
-    }
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        ydl.extract_info(video_url, download=True)
-    return f"{video_id}.mp3"
+    """
+    Downloads audio-only stream using pytube (no ffmpeg required).
+    Returns the path to the downloaded file.
+    """
+    yt = YouTube(video_url)
+    stream = yt.streams.filter(only_audio=True).first()
+    output_file = f"{video_id}.mp4"
+    stream.download(filename=output_file)
+    print(f"Downloaded audio to {output_file}")
+    return output_file
 
 def chunk_text(text: str, chunk_size: int = 500, overlap: int = 50) -> list[str]:
     """Splits a long text into smaller, overlapping chunks."""
-    return [text[i:i+chunk_size] for i in range(0, len(text), chunk_size - overlap)]
+    return [text[i:i + chunk_size] for i in range(0, len(text), chunk_size - overlap)]
