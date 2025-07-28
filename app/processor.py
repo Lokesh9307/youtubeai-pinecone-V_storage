@@ -59,16 +59,20 @@ def process_video_and_upsert(video_url: str, video_id: str):
         return {"status": "error", "message": str(e)}
 
 def download_audio(video_url: str, video_id: str) -> str:
-    """
-    Downloads audio-only stream using pytube (no ffmpeg required).
-    Returns the path to the downloaded file.
-    """
-    yt = YouTube(video_url)
-    stream = yt.streams.filter(only_audio=True).first()
-    output_file = f"{video_id}.mp4"
-    stream.download(filename=output_file)
-    print(f"Downloaded audio to {output_file}")
-    return output_file
+    try:
+        print(f"Starting YouTube download: {video_url}")
+        yt = YouTube(video_url)
+        stream = yt.streams.filter(only_audio=True).first()
+        if not stream:
+            raise Exception("No audio stream found.")
+        output_file = f"{video_id}.mp4"
+        stream.download(filename=output_file)
+        print(f"Downloaded audio to {output_file}")
+        return output_file
+    except Exception as e:
+        print(f"Download error: {e}")
+        raise
+
 
 def chunk_text(text: str, chunk_size: int = 500, overlap: int = 50) -> list[str]:
     """Splits a long text into smaller, overlapping chunks."""
